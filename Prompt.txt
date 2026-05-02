@@ -1,0 +1,36 @@
+Act as an expert React developer. I want you to build a single-file React application (App.jsx) called "Ambient Scene Scanner." This app uses the device camera to analyze the user's surroundings in real-time, extracts color palettes, uses a Vision LLM to generate a poetic vibe check, and allows the user to export a custom Polaroid-style postcard.
+Please use Tailwind CSS for all styling and include necessary inline SVG icons.
+
+Here are the strict technical and feature requirements:
+1. Camera & Layout
+Request access to the user's environment-facing camera.
+Display the live video feed full-screen as the app background (object-cover) with a dark vignette overlay (radial-gradient).
+Handle permissions gracefully and display a fallback UI if camera access is denied.
+
+2. Real-Time Color Extraction (No External Libraries)
+Create a hidden <canvas> to process the video feed in real-time (using requestAnimationFrame, throttled to ~5fps for performance).
+Extract the 5 distinct dominant RGB colors from the frame.
+Convert these RGB values to Hex codes.
+Store them in state to be displayed in a live "Design Token" strip inside a glassmorphism control panel at the bottom of the screen.
+
+3. Vision LLM Integration (Scene Soul)
+Every 6 seconds, capture a low-res snapshot (640x480) from the video feed.
+Send this base64 image to the Gemini 1.5/2.5 Flash Vision API.
+LLM Prompt: "Analyze the mood, lighting, and colors of this webcam frame. Provide a JSON response with exactly two keys: 'caption' (a sharp, clever, and interesting one-liner capturing the vibe, maximum 7 words. Avoid cliché, cringy, or overly dramatic poetic phrasing. Think witty, insightful observations) and 'paletteName' (a creative, two-word aesthetic name for the colors)."
+Overlay the resulting caption in the dead center of the live camera feed using a large, elegant serif font (Georgia, italic) with a heavy text-shadow. Display the paletteName in the bottom control panel.
+
+4. The "Postcard" Export Generator
+When the user clicks "Capture Postcard" in the control panel, use a Canvas API to generate a high-res vertical Polaroid (Instax Mini style, e.g., 1080x1720).
+The Canvas Layout:
+Base: Off-white background (#f8f8f8).
+Image: Draw a center-cropped 4:5 vertical slice of the current video frame.
+Filter: Apply a soft polaroid filter to the image context (contrast(1.05) saturate(0.95) brightness(1.05)) and a soft neutral radial vignette.
+Text: Draw the LLM caption below the image (Georgia, italic), followed by the paletteName (sans-serif, bold, spaced).
+Color Swatches: Draw 5 large 140x140 square swatches of the dominant colors at the bottom. Render their exact Hex codes in monospace font directly beneath each square.
+
+5. Modal & Sharing UI
+Display the generated canvas image in a dark, blurred modal (max-h-[75vh] object-contain).
+Include three action buttons under the image:
+"Back": Closes the modal.
+"Copy Hex": Copies a comma-separated string of the 5 hex codes to the user's clipboard and temporarily changes the button text to "Copied!".
+"Save": Uses the native Web Share API (navigator.canShare / navigator.share) to allow mobile users to save directly to their camera roll. Fall back to a standard <a> download tag for desktop browsers. Name the file scene-soul-[timestamp].jpg.
